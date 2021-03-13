@@ -11,8 +11,7 @@ public class EnemyBehaviour : MonoBehaviour
 
     private int WaypointIndex;
     private float dist;
-    
-    [SerializeField] private FieldO
+
     // Start is called before the first frame update
     void Start()
     {

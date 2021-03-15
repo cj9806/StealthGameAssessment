@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class EnemyBehaviour : MonoBehaviour
 {
+    [SerializeField] private FieldOfView fov;
     public float rotationSpeed;
     public float moveSpeed;
     public Transform[] waypoints;
@@ -22,6 +23,8 @@ public class EnemyBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        fov.setOrigin(transform.position);
+        fov.setAimDirection(transform.right);
         NormalPatrol();
     }
     void MoveTowards()

@@ -23,8 +23,6 @@ public class EnemyBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        fov.setOrigin(transform.position);
-        fov.setAimDirection(transform.right);
         NormalPatrol();
     }
     void MoveTowards()
@@ -41,7 +39,7 @@ public class EnemyBehaviour : MonoBehaviour
     }
     void NormalPatrol()
     {
-        float totalDeltaAngle = Vector2.Angle(transform.position, waypoints[WaypointIndex].position);
+        float totalDeltaAngle = Vector2.Angle(transform.right, (waypoints[WaypointIndex].position - transform.position).normalized);
 
         Vector2 a = transform.right;
         Vector2 b = (waypoints[WaypointIndex].position - transform.position).normalized;
@@ -55,7 +53,7 @@ public class EnemyBehaviour : MonoBehaviour
         transform.rotation *= Quaternion.AngleAxis(finalDeltaAngle * rotDir, Vector3.back);
 
         float dot = Vector2.Dot(transform.right, (waypoints[WaypointIndex].position - transform.position).normalized);
-        if ((1.0f - dot) < Mathf.Epsilon)
+        if (dot < Mathf.Epsilon)
         {
             Debug.Log("EXACT");
         }

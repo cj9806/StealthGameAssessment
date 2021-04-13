@@ -11,7 +11,9 @@ public class EnemyBehaviour : MonoBehaviour
 
     private int WaypointIndex;
     private float dist;
-    private Transform player;
+    public Transform player;
+
+    public int rayDist;
 
     // Start is called before the first frame update
     void Start()
@@ -23,12 +25,15 @@ public class EnemyBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (alertState == 0)
+        
+        NormalPatrol();
+        //eyes
+        RaycastHit2D hit = Physics2D.Raycast(this.transform.position, transform.right, rayDist);
+        Debug.DrawRay(transform.position, hit.point);
+        if (hit.collider.name == "Player")
         {
-            NormalPatrol();
+            Debug.Log("player");
         }
-
-
     }
     void MoveTowards()
     {
@@ -44,15 +49,6 @@ public class EnemyBehaviour : MonoBehaviour
     }
     void NormalPatrol()
     {
-        //eyes
-        RaycastHit2D hit = Physics2D.Raycast(this.transform.position, transform.right, 5);
-        Debug.DrawRay(transform.position, hit.point);
-        if (hit.collider.name == "Player")
-        {
-            alertState = 1;
-        }
-
-
         float totalDeltaAngle = Vector2.Angle(transform.right, (waypoints[WaypointIndex].position - transform.position).normalized);
 
         Vector2 a = transform.right;
@@ -83,9 +79,30 @@ public class EnemyBehaviour : MonoBehaviour
         }
     }
 
-    void SeePlayer()
-    {
+    //void SeePlayer()
+    //{
+    //    float totalDeltaAngle = Vector2.Angle(transform.right, (player.position - transform.position).normalized);
 
-    }
+    //    Vector2 a = transform.right;
+    //    Vector2 b = (player.position - transform.position).normalized;
+    //    Vector2 d = Vector2.Perpendicular(b);
+
+    //    float dotAD = Vector2.Dot(a, d);
+    //    float rotDir = dotAD > 0 ? 1 : -1;
+
+    //    float finalDeltaAngle = Mathf.Min(totalDeltaAngle, Time.deltaTime * 15);
+
+    //    transform.rotation *= Quaternion.AngleAxis(finalDeltaAngle * rotDir, Vector3.back);
+
+    //    float dot = Vector2.Dot(transform.right, (waypoints[WaypointIndex].position - transform.position).normalized);
+    //    if (dot > .99 && dot < 1.01)
+    //    {
+    //        //shoot at player
+    //    }
+    //    else
+    //    {
+    //        alertState = 0;
+    //    }
+    //}
 }
 

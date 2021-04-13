@@ -11,28 +11,42 @@ public class EnemyBehaviour : MonoBehaviour
 
     private int WaypointIndex;
     private float dist;
+    public Transform Gun;
     public Transform player;
+    public GameObject bulletPrefab;
+
+    public float bulletForce;
 
     public int rayDist;
-
+    public int timeBetweenShots;
+    private bool counting;
+    private float targetTime;
     // Start is called before the first frame update
     void Start()
     {
         WaypointIndex = 0;
         alertState = 0;
+        counting = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-        NormalPatrol();
+        if (alertState == 0)
+        {
+            NormalPatrol();
+        }
+        else if(alertState == 1)
+        {
+            ShootAtPlayer();
+        }
         //eyes
         RaycastHit2D hit = Physics2D.Raycast(this.transform.position, transform.right, rayDist);
         Debug.DrawRay(transform.position, hit.point);
         if (hit.collider.name == "Player")
         {
             Debug.Log("player");
+            alertState = 1;
         }
     }
     void MoveTowards()
@@ -63,11 +77,7 @@ public class EnemyBehaviour : MonoBehaviour
         transform.rotation *= Quaternion.AngleAxis(finalDeltaAngle * rotDir, Vector3.back);
 
         float dot = Vector2.Dot(transform.right, (waypoints[WaypointIndex].position - transform.position).normalized);
-        if (dot < Mathf.Epsilon)
-        {
-            Debug.Log("EXACT");
-        }
-
+        
         if (dot > .99 && dot < 1.01)
         {
             MoveTowards();
@@ -78,31 +88,49 @@ public class EnemyBehaviour : MonoBehaviour
             }
         }
     }
+    void ShootAtPlayer()
+    {
+        //rotate towards player
+        float totalDeltaAngle = Vector2.Angle(transform.right, (player.position - transform.position).normalized);
 
-    //void SeePlayer()
-    //{
-    //    float totalDeltaAngle = Vector2.Angle(transform.right, (player.position - transform.position).normalized);
+        Vector2 a = transform.right;
+        Vector2 b = (player.position - transform.position).normalized;
+        Vector2 d = Vector2.Perpendicular(b);
 
-    //    Vector2 a = transform.right;
-    //    Vector2 b = (player.position - transform.position).normalized;
-    //    Vector2 d = Vector2.Perpendicular(b);
+        float dotAD = Vector2.Dot(a, d);
+        float rotDir = dotAD > 0 ? 1 : -1;
 
-    //    float dotAD = Vector2.Dot(a, d);
-    //    float rotDir = dotAD > 0 ? 1 : -1;
+        float finalDeltaAngle = Mathf.Min(totalDeltaAngle, Time.deltaTime * rotationSpeed*10);
 
-    //    float finalDeltaAngle = Mathf.Min(totalDeltaAngle, Time.deltaTime * 15);
+        transform.rotation *= Quaternion.AngleAxis(finalDeltaAngle * rotDir, Vector3.back);
 
-    //    transform.rotation *= Quaternion.AngleAxis(finalDeltaAngle * rotDir, Vector3.back);
+        float dot = Vector2.Dot(transform.right, (player.position - transform.position).normalized);
 
-    //    float dot = Vector2.Dot(transform.right, (waypoints[WaypointIndex].position - transform.position).normalized);
-    //    if (dot > .99 && dot < 1.01)
-    //    {
-    //        //shoot at player
-    //    }
-    //    else
-    //    {
-    //        alertState = 0;
-    //    }
-    //}
+        
+        if (!counting)
+        {
+            counting = true;
+            targetTime = Time.time + timeBetweenShots;
+        }
+        else
+        {
+            
+            float currentTime = Time.time;
+            if(currentTime>= targetTime)
+            {
+                counting = false;
+                Shoot();
+            }
+            
+        }
+        //every 2seconds
+            //shoot at player
+    }
+    void Shoot() 
+    {
+        GameObject bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
+        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
+        rb.AddForce(transform.right * bulletForce, ForceMode2D.Impulse);
+    }
 }
 

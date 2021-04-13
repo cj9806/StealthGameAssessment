@@ -13,6 +13,7 @@ public class EnemyBehaviour : MonoBehaviour
     private float dist;
     public Transform Gun;
     public Transform player;
+    public playerControls playerControls;
     public GameObject bulletPrefab;
 
     public float bulletForce;
@@ -45,7 +46,6 @@ public class EnemyBehaviour : MonoBehaviour
         Debug.DrawRay(transform.position, hit.point);
         if (hit.collider.name == "Player")
         {
-            Debug.Log("player");
             alertState = 1;
         }
     }
@@ -119,7 +119,15 @@ public class EnemyBehaviour : MonoBehaviour
             if(currentTime>= targetTime)
             {
                 counting = false;
-                Shoot();
+                if(Physics2D.Raycast(this.transform.position, transform.right, rayDist).collider.name == "Player")
+                {
+                    Shoot();
+                }
+                else
+                {
+                    alertState = 0;
+                }
+                
             }
             
         }
@@ -128,9 +136,9 @@ public class EnemyBehaviour : MonoBehaviour
     }
     void Shoot() 
     {
-        GameObject bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
-        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-        rb.AddForce(transform.right * bulletForce, ForceMode2D.Impulse);
+        Debug.DrawLine(this.transform.position, player.position, Color.red, 0.5f);
+        playerControls.health--;
+        Debug.Log("health: " + playerControls.health);
     }
 }
 

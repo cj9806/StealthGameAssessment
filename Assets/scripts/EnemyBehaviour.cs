@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class EnemyBehaviour : MonoBehaviour
 {
-    [SerializeField] private FieldOfView fov;
     public float rotationSpeed;
     public float moveSpeed;
     public Transform[] waypoints;
@@ -12,6 +11,7 @@ public class EnemyBehaviour : MonoBehaviour
 
     private int WaypointIndex;
     private float dist;
+    private Transform player;
 
     // Start is called before the first frame update
     void Start()
@@ -23,7 +23,12 @@ public class EnemyBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        NormalPatrol();
+        if (alertState == 0)
+        {
+            NormalPatrol();
+        }
+
+
     }
     void MoveTowards()
     {
@@ -32,13 +37,22 @@ public class EnemyBehaviour : MonoBehaviour
     void IncreaseIndex()
     {
         WaypointIndex++;
-        if(WaypointIndex >= waypoints.Length)
+        if (WaypointIndex >= waypoints.Length)
         {
             WaypointIndex = 0;
         }
     }
     void NormalPatrol()
     {
+        //eyes
+        RaycastHit2D hit = Physics2D.Raycast(this.transform.position, transform.right, 5);
+        Debug.DrawRay(transform.position, hit.point);
+        if (hit.collider.name == "Player")
+        {
+            alertState = 1;
+        }
+
+
         float totalDeltaAngle = Vector2.Angle(transform.right, (waypoints[WaypointIndex].position - transform.position).normalized);
 
         Vector2 a = transform.right;
@@ -68,4 +82,10 @@ public class EnemyBehaviour : MonoBehaviour
             }
         }
     }
+
+    void SeePlayer()
+    {
+
+    }
 }
+

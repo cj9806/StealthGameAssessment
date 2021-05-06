@@ -46,35 +46,38 @@ public class Destination : MonoBehaviour
             complete = false;
         }
         //let path frog rach destination
-        float xDist = pathFrog.transform.position.x - this.transform.position.x;
-        //get to destination
-        float yDist = pathFrog.transform.position.y - this.transform.position.y;
-        if (System.Math.Abs(xDist) < 1 && System.Math.Abs(yDist) < 1 && !onWayBack && !complete)
+        if(pathFrog.activeInHierarchy)
         {
-            //pathfrog path finds back to last patrol point
-            closestWaypoint = GetClosestWaypoint(waypoints);
-            this.transform.position = closestWaypoint.position;
-            onWayBack = true;
-        }
-        else if (Vector3.Distance(closestWaypoint.position, this.transform.position) < 1 && onWayBack)
-        {
-            complete = true;
-            onWayBack = false;
-            patrolFrog.SetActive(true);
-            patrolFrog.transform.position = pathFrog.transform.position;
-            patrolFrog.transform.rotation = pathFrog.transform.rotation;
-            for(int i = 0; i < waypoints.Length; i++)
+            float xDist = pathFrog.transform.position.x - this.transform.position.x;
+            //get to destination
+            float yDist = pathFrog.transform.position.y - this.transform.position.y;
+            if (System.Math.Abs(xDist) < 1 && System.Math.Abs(yDist) < 1 && !onWayBack && !complete)
             {
-                if (closestWaypoint = waypoints[i]) eb.WaypointIndex = i;
+                //pathfrog path finds back to last patrol point
+                closestWaypoint = GetClosestWaypoint(waypoints);
+                this.transform.position = closestWaypoint.position;
+                onWayBack = true;
             }
+            else if (Vector3.Distance(closestWaypoint.position, this.transform.position) < 1)
+            {
+                complete = true;
+                onWayBack = false;
+                patrolFrog.transform.position = pathFrog.transform.position;
+                patrolFrog.transform.rotation = pathFrog.transform.rotation;
+                patrolFrog.transform.rotation *= Quaternion.Euler(0, 0, 90);
+                for (int i = 0; i < waypoints.Length; i++)
+                {
+                    if (closestWaypoint.transform == waypoints[i].transform) eb.WaypointIndex = i;
+                }
 
-            //change active frogs
-            pathFrog.SetActive(false);
-            
-            //home reached
+                //change active frogs
+                pathFrog.SetActive(false);
+                patrolFrog.SetActive(true);
 
+                //home reached
+
+            }
         }
-
 
         //change frog rotation because math is hard
 
